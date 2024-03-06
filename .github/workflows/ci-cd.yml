@@ -1,0 +1,27 @@
+name: App streamlit using CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4 #recupere le projet gitlab action
+
+      - name: Set up Docker Build
+        uses: docker/setup-buildx-action@v3
+
+      # Docker image 
+      - name: Build Docker Image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/appstreamlit:v1 .
+
+      - name: Login to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Docker Push
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/appstreamlit:v1
